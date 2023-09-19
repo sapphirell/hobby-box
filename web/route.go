@@ -31,7 +31,6 @@ func LoadRouter() {
 
 func LoginVerify() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		log.Println("中间件启动了")
 		authorization := c.GetHeader("Authorization")
 		if authorization == "" {
 			api.Base.Failed(c, "missing header params")

@@ -6,7 +6,7 @@
       <paths name="tx_cloud">
         <serverdata>
           <mappings>
-            <mapping deploy="/" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/" local="$PROJECT_DIR$/../hobby-box" web="/" />
           </mappings>
         </serverdata>
       </paths>
