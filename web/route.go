@@ -3,6 +3,7 @@ package web
 import (
 	gin "github.com/gin-gonic/gin"
 	"log"
+	"net/http"
 	"sukitime.com/v2/web/api"
 	"sukitime.com/v2/web/api/box"
 	"sukitime.com/v2/web/api/spider"
@@ -13,6 +14,9 @@ import (
 
 func LoadRouter() {
 	router := gin.Default()
+	router.GET("/", func(context *gin.Context) {
+		context.String(http.StatusOK, "api")
+	})
 	router.GET("/index", IndexView.Page)
 	router.POST("/login", User.Login)
 	router.POST("/red_book_spider", spider.GetDownloadList)
