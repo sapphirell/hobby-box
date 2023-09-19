@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = ".;service";
+
+//定义可调用的GRPC接口
+service SayHello {
+  rpc SayHello(HelloRequest) returns (HelloResponse) {}
+}
+
+//message字段定义一个消息类型， 1234是消息结构中的排序位置
+message HelloRequest {
+  string requestName = 1;
+  int64 age = 2;
+  repeated string name = 3;
+}
+
+message HelloResponse {
+  string responseMsg = 1;
+}

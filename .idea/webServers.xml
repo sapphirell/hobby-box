@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="8cbaee9c-0fc8-4e08-b17c-50e2437c6546" name="tx_cloud">
+        <fileTransfer rootFolder="/data/golang_dev/fantuanpu_go" accessType="SFTP" host="111.229.182.88" port="22" sshConfigId="043c6970-b27a-408f-beb5-e70d48577180" sshConfig="ubuntu@111.229.182.88:22 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
