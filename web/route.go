@@ -4,6 +4,7 @@ import (
 	gin "github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"path/filepath"
 	"sukitime.com/v2/web/api"
 	"sukitime.com/v2/web/api/box"
 	"sukitime.com/v2/web/api/spider"
@@ -30,7 +31,29 @@ func LoadRouter() {
 		needLoginGroup.POST("/add-items", box.AddItems)
 	}
 
-	router.Run()
+	go func() {
+		//启动tls
+		certPath, _ := filepath.Abs("./web/cert/api.fantuanpu.com/api.fantuanpu.com_bundle.pem")
+		keyPath, _ := filepath.Abs("./web/cert/api.fantuanpu.com/api.fantuanpu.com.key")
+		err := router.RunTLS(":443",
+			certPath,
+			keyPath)
+		if err != nil {
+			log.Fatal("https api启动错误", err)
+			return
+		}
+
+	}()
+
+	go func() {
+		//启动http
+		err := router.Run(":8080")
+		if err != nil {
+			log.Fatal("http启动错误")
+			return
+		}
+	}()
+
 }
 
 func LoginVerify() gin.HandlerFunc {
