@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
+	log.SetFlags(log.Ldate | log.Ltime | log.Llongfile)
 	var w = make(chan int, 1)
-
 	err := godotenv.Load()
 	if err != nil {
 		log.Panicln("Error loading .env file")

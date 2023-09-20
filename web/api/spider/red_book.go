@@ -8,14 +8,26 @@ import (
 	"github.com/gocolly/colly"
 	"log"
 	"net/url"
+	"os"
 	"regexp"
 	"strings"
+	"sukitime.com/v2/tools"
 	"sukitime.com/v2/web/api"
 	"time"
 )
 
+type getDownloadListVerify struct {
+	ShareLink string `json:"share_link" binding:"required"`
+}
+
 func GetDownloadList(ctx *gin.Context) {
-	link := FindLinkByShare(testShareText)
+	//link := FindLinkByShare(testShareText)
+	var binding getDownloadListVerify
+	if err := ctx.ShouldBindJSON(&binding); err != nil {
+		api.Base.Failed(ctx, "缺少必要参数")
+		return
+	}
+	link := FindLinkByShare(binding.ShareLink)
 	u, err := url.Parse(link)
 	if err != nil {
 		api.Base.Failed(ctx, "无法解析的URL")
@@ -63,7 +75,26 @@ func GetDownloadList(ctx *gin.Context) {
 		for v, _ := range backgroundsMap {
 			bgs = append(bgs, v)
 		}
-		api.Base.Success(ctx, bgs)
+		ret := make([]string, 0)
+		// 成功，下载并上传
+		for _, downloadUrl := range bgs {
+			storePath, saveName, err := tools.Download(downloadUrl, 5*time.Second)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			savePath := fmt.Sprintf("sp/%s/%s", time.Now().Format("2006_01_02"), saveName)
+			success, _ := tools.Upload2QiNiu(storePath, savePath)
+			success = "https://images1.fantuanpu.com/" + success
+			ret = append(ret, success)
+			//删除本地文件
+			err = os.Remove(storePath)
+			if err != nil {
+				log.Printf("移除文件%s失败", storePath)
+			}
+		}
+
+		api.Base.Success(ctx, ret)
 		return
 	})
 	c.OnError(func(resp *colly.Response, errHttp error) {

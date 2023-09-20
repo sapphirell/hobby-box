@@ -1,8 +1,7 @@
-package tools
+package main
 
 import (
 	"context"
-	"crypto/md5"
 	"errors"
 	"fmt"
 	"github.com/qiniu/go-sdk/v7/auth/qbox"
@@ -11,31 +10,40 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"sukitime.com/v2/tools"
 	"time"
 )
 
-// HexMd5 计算32位md5， salt可选加盐
-func HexMd5(s string, salt string) string {
-	b := []byte(s)
-	if salt != "" {
-		b = append(b, []byte(salt)...)
+func main() {
+	dArr := []string{
+		"https://sns-img-bd.xhscdn.com/6ed83d93-353e-d023-3109-485b26af3409?imageView2/2/w/1920/format/jpg|imageMogr2/strip",
+		"https://sns-img-bd.xhscdn.com/7dac19bf-36c1-0cb6-7d90-acd23eac4bc4?imageView2/2/w/1920/format/jpg|imageMogr2/strip",
 	}
-	hash := md5.New()
-	_, err := hash.Write(b)
+
+	store, save, err := download(dArr[0], 3*time.Second)
 	if err != nil {
-		log.Println("生成md5错误", err)
+		log.Println("下载失败", err)
+		return
 	}
-	sum := hash.Sum(nil)
-	return fmt.Sprintf("%x", sum)
+	log.Println("存储目录", store)
+	save = fmt.Sprintf("sp/%s/%s", time.Now().Format("2006_01_02"), save)
+	upload2QiNiu(store, save)
+	//for _, s := range dArr {
+	//	log.Println("download:", s)
+	//	store, err := download(s, 1*time.Second)
+	//	if err != nil {
+	//		log.Println("下载失败", err)
+	//	}
+	//	log.Println("存储目录", store)
+	//}
 }
 
-// Download 通用下载方法
-func Download(url string, timeout time.Duration) (store string, fileName string, err error) {
+func download(url string, timeout time.Duration) (store string, fileName string, err error) {
 	downloadChan := make(chan string, 1)
 	timeoutChan := make(chan string, 1)
 	errChan := make(chan error, 1)
 	//建议存储的fileName
-	fileName = HexMd5(url, "") + ".jpg"
+	fileName = tools.HexMd5(url, "") + ".jpg"
 	go func() {
 		time.Sleep(timeout)
 		timeoutChan <- "*"
@@ -54,7 +62,7 @@ func Download(url string, timeout time.Duration) (store string, fileName string,
 			errChan <- err
 			return
 		}
-		storePath, _ := filepath.Abs(fmt.Sprintf("./public/tmp/red_book/%s", fileName))
+		storePath, _ := filepath.Abs(fmt.Sprintf("../tmp/red_book/%s", fileName))
 		err = ioutil.WriteFile(storePath, content, 0666)
 		if err != nil {
 			errChan <- err
@@ -73,7 +81,7 @@ func Download(url string, timeout time.Duration) (store string, fileName string,
 	}
 }
 
-func Upload2QiNiu(url string, save string) (savePath string, err error) {
+func upload2QiNiu(url string, save string) {
 	putPolicy := storage.PutPolicy{
 		Scope: "hobby-box",
 	}
@@ -87,11 +95,10 @@ func Upload2QiNiu(url string, save string) (savePath string, err error) {
 	// 构建表单上传的对象
 	formUploader := storage.NewFormUploader(&cfg)
 	ret := storage.PutRet{}
-	err = formUploader.PutFile(context.Background(), &ret, upToken, save, url, nil)
+	err := formUploader.PutFile(context.Background(), &ret, upToken, save, url, nil)
 	if err != nil {
-		return "", err
+		fmt.Println(err)
+		return
 	}
-	//fmt.Println(ret.Key, ret.Hash)
-
-	return ret.Key, nil
+	fmt.Println(ret.Key, ret.Hash)
 }
