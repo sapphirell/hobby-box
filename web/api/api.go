@@ -32,6 +32,15 @@ func (b *BaseApi) Failed(ctx *gin.Context, msg string) {
 	})
 }
 
+func (b *BaseApi) FailedWithContent(ctx *gin.Context, msg string, content interface{}) {
+	ctx.Header("Content-Type", "application/json")
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "failed",
+		"msg":    msg,
+		"data":   content,
+	})
+}
+
 // GetParam 获取JSON参数
 func (b *BaseApi) GetParam(ctx *gin.Context, key string) interface{} {
 	j := make(map[string]interface{})

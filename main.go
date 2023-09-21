@@ -18,6 +18,8 @@ func main() {
 	bootstrap.InitGorm()
 	//初始化Redis
 	bootstrap.InitRedis()
+	//初始化社交client
+	bootstrap.InitSocial()
 	//初始化GRPC
 	go bootstrap.InitExportRpcServer()
 	//初始化路由

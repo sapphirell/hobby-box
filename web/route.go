@@ -20,6 +20,7 @@ func LoadRouter() {
 	})
 	router.GET("/index", IndexView.Page)
 	router.POST("/login", User.Login)
+	router.POST("/login-with-wechat", User.LoginWithWechat)
 	router.POST("/red_book_spider", spider.GetDownloadList)
 
 	needLoginGroup := router.Group("/with-state")

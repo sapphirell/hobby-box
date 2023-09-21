@@ -4,17 +4,19 @@ import "sukitime.com/v2/bootstrap"
 
 // User 用户表
 type User struct {
-	Id              int64  `json:"id"`
-	LastLoginTime   int64  `json:"last_login_time"`
-	Account         string `json:"account"`
-	Avatar          string `json:"avatar"`
-	TelPhone        string `json:"tel_phone"`
-	Mail            string `json:"mail"`
-	LastToken       string `json:"last_token"`
-	LastTokenExpire int64  `json:"last_token_expire"`
-	Username        string `json:"username"`
-	Password        string `json:"password"`
-	CreatedAt       int64  `json:"created_at"`
+	Id               int64  `json:"id"`
+	LastLoginTime    int64  `json:"last_login_time"`
+	Account          string `json:"account"`
+	Avatar           string `json:"avatar"`
+	TelPhone         string `json:"tel_phone"`
+	Mail             string `json:"mail"`
+	LastToken        string `json:"last_token"`
+	LastTokenExpire  int64  `json:"last_token_expire"`
+	Username         string `json:"username"`
+	Password         string `json:"password"`
+	CreatedAt        int64  `json:"created_at"`
+	WechatOpenID     string `json:"wechat_open_id"`
+	WechatSessionKey string `json:"wechat_session_key"`
 }
 
 var UserModel User

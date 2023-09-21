@@ -9,8 +9,10 @@ import (
 	"github.com/qiniu/go-sdk/v7/storage"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"time"
 )
 
@@ -35,7 +37,7 @@ func Download(url string, timeout time.Duration) (store string, fileName string,
 	timeoutChan := make(chan string, 1)
 	errChan := make(chan error, 1)
 	//建议存储的fileName
-	fileName = HexMd5(url, "") + ".jpg"
+	fileName = HexMd5(url, strconv.Itoa(rand.Int())) + ".jpg"
 	go func() {
 		time.Sleep(timeout)
 		timeoutChan <- "*"
