@@ -38,15 +38,13 @@ type wechatLoginVerify struct {
 	JsToken string `binding:"required" json:"js_token"`
 }
 
-type RegisterVerify struct {
-	Account          string `binding:"required"`
-	Password         string `binding:"required"`
-	Avatar           string
-	TelPhone         string
-	Mail             string
-	Username         string //昵称
-	WechatOpenID     string `json:"wechat_open_id"`
-	WechatSessionKey string `json:"wechat_session_key"`
+type WeChatRegisterVerify struct {
+	Account      string `binding:"required"`
+	Avatar       string
+	TelPhone     string
+	Mail         string
+	Username     string //昵称
+	WechatOpenID string `binding:"required" json:"wechat_open_id"`
 }
 
 var JwtSignKey = []byte("fantuanKey")
@@ -79,6 +77,25 @@ func makeLogin(user *model.User) (JT string, err error) {
 	return jwtToken, nil
 }
 
+func makeRegister(u *model.User) (*model.User, error) {
+	user := model.User{
+		Account:      u.Account,
+		Avatar:       u.Avatar,
+		TelPhone:     u.TelPhone,
+		Mail:         u.Mail,
+		Username:     u.Username,
+		Password:     u.Password,
+		WechatOpenID: u.WechatOpenID,
+		CreatedAt:    time.Now().Unix(),
+		ShortDomain:  u.ShortDomain,
+	}
+	result := bootstrap.DB.Create(&user)
+	if result.Error != nil {
+		log.Printf("有用户注册失败，原因:%s。参数%+v", result.Error, user)
+		return nil, errors.New(fmt.Sprintf(api.FailedMsg, "系统内部错误，暂时无法注册"))
+	}
+	return &user, nil
+}
 func Login(ctx *gin.Context) {
 	loginStruct := loginVerify{}
 	if err := ctx.ShouldBind(&loginStruct); err != nil {
@@ -139,13 +156,20 @@ func LoginWithWechat(ctx *gin.Context) {
 	user := new(model.User)
 	res := bootstrap.DB.Where("wechat_open_id = ?", wechatResp.OpenID).First(user)
 	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-		content := make(map[string]string)
-		content["open_id"] = wechatResp.OpenID
-		content["session_key"] = wechatResp.SessionKey
-		api.Base.FailedWithContent(ctx, fmt.Sprintf(api.FailedMsg, "该open_id未注册"), content)
-		return
-	}
-	if res.Error != nil {
+		//如果未注册用户，则生成一个新号
+		user.WechatOpenID = wechatResp.OpenID
+		user.WechatSessionKey = wechatResp.SessionKey
+		user.Password = "wechat-register"
+		user.Username = "微信用户" + wechatResp.OpenID
+		user.Account = "微信用户" + wechatResp.OpenID
+		user.Avatar = "/default_avatar.jpg"
+		user.ShortDomain = ""
+		user, err = makeRegister(user)
+		if err != nil {
+			api.Base.Failed(ctx, err.Error())
+			return
+		}
+	} else {
 		api.Base.Failed(ctx, "服务器内部错误暂时无法登录auth-50002")
 		return
 	}
@@ -191,40 +215,4 @@ func Mine(ctx *gin.Context) {
 	}
 	api.Base.Success(ctx, userStatus)
 	return
-}
-
-func Register(ctx *gin.Context) {
-	registerVerify := RegisterVerify{}
-	if err := ctx.ShouldBind(&registerVerify); err != nil {
-		log.Println("注册参数错误", err.Error())
-		api.Base.Failed(ctx, fmt.Sprintf(api.FailedMsg, "注册信息填写错了！"))
-		return
-	}
-
-	//填充默认参数
-	if registerVerify.Avatar == "" {
-		registerVerify.Avatar = "default_avatar.jpg"
-	}
-	if registerVerify.Username == "" {
-		registerVerify.Username = registerVerify.Account
-	}
-	user := model.User{
-		Account:          registerVerify.Account,
-		Avatar:           registerVerify.Avatar,
-		TelPhone:         registerVerify.TelPhone,
-		Mail:             registerVerify.Mail,
-		Username:         registerVerify.Username,
-		Password:         registerVerify.Password,
-		WechatOpenID:     registerVerify.WechatOpenID,
-		WechatSessionKey: registerVerify.WechatSessionKey,
-		CreatedAt:        time.Now().Unix(),
-	}
-	result := bootstrap.DB.Create(&user)
-	if result.Error != nil {
-		api.Base.Failed(ctx, fmt.Sprintf(api.FailedMsg, "系统内部错误，暂时无法注册。"))
-		log.Printf("有用户注册失败，原因:%s。参数%+v", result.Error, user)
-		return
-	}
-	//TODO:注册成功后立即返回登录状态
-	api.Base.Success(ctx, "")
 }

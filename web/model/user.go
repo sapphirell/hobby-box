@@ -17,6 +17,7 @@ type User struct {
 	CreatedAt        int64  `json:"created_at"`
 	WechatOpenID     string `json:"wechat_open_id"`
 	WechatSessionKey string `json:"wechat_session_key"`
+	ShortDomain      string `json:"short_domain"`
 }
 
 var UserModel User

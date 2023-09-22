@@ -22,12 +22,11 @@ func LoadRouter() {
 	router.POST("/login", User.Login)
 	router.POST("/login-with-wechat", User.LoginWithWechat)
 	router.POST("/red_book_spider", spider.GetDownloadList)
-
+	//router.POST("/register-with-wechat", User.RegisterWithWeChat)
 	needLoginGroup := router.Group("/with-state")
 	{
 		needLoginGroup.Use(LoginVerify())
 		needLoginGroup.GET("/mine", User.Mine)
-		needLoginGroup.POST("/register", User.Register)
 		needLoginGroup.GET("/box-items", box.ItemList)
 		needLoginGroup.POST("/add-items", box.AddItems)
 	}
