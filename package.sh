@@ -8,7 +8,7 @@ cmd() {
     echo -e "\033[36mCOMMAND: ${1} \033[0m"
     $1
 }
-
+git pull
 #清理无用镜像
 #停止
 docker stop $(docker ps -a | grep "Exited" | awk '{print $1 }')
