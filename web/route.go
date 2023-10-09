@@ -29,6 +29,10 @@ func LoadRouter() {
 		needLoginGroup.GET("/mine", User.Mine)
 		needLoginGroup.GET("/box-items", box.ItemList)
 		needLoginGroup.POST("/add-items", box.AddItems)
+		needLoginGroup.POST("/update-profile", User.UpdateProfileFn)
+		needLoginGroup.POST("/update-account", User.UpdateLoginAccount)
+		// 七牛token获取
+		needLoginGroup.POST("/qiniu-token", box.QiniuToken)
 	}
 
 	go func() {

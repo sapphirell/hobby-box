@@ -75,12 +75,14 @@ func Download(url string, timeout time.Duration) (store string, fileName string,
 	}
 }
 
+var ak = "HTTyjWkdHISJbKTD0n3OZ_2UPt-AvBKdPRZs2wxQ"
+var sk = "9Xp6-AlBO9mqP9iyPKsYgxVadj93sIEcfdGxxnG9"
+
 func Upload2QiNiu(url string, save string) (savePath string, err error) {
 	putPolicy := storage.PutPolicy{
 		Scope: "hobby-box",
 	}
-	mac := qbox.NewMac("HTTyjWkdHISJbKTD0n3OZ_2UPt-AvBKdPRZs2wxQ",
-		"9Xp6-AlBO9mqP9iyPKsYgxVadj93sIEcfdGxxnG9")
+	mac := qbox.NewMac(ak, sk)
 	upToken := putPolicy.UploadToken(mac)
 	cfg := storage.Config{}
 	cfg.Region = &storage.ZoneHuadongZheJiang2
@@ -96,4 +98,16 @@ func Upload2QiNiu(url string, save string) (savePath string, err error) {
 	//fmt.Println(ret.Key, ret.Hash)
 
 	return ret.Key, nil
+}
+
+func GetQiniuUploadToken(path string) (token string) {
+	bucket := "hobby-box"
+	// 需要覆盖的文件名
+	rand.Uint64()
+
+	putPolicy := storage.PutPolicy{
+		Scope: fmt.Sprintf("%s:%s", bucket, path),
+	}
+	mac := qbox.NewMac(ak, sk)
+	return putPolicy.UploadToken(mac)
 }
