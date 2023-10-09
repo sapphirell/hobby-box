@@ -169,8 +169,9 @@ func LoginWithWechat(ctx *gin.Context) {
 			api.Base.Failed(ctx, err.Error())
 			return
 		}
-	} else {
-		api.Base.Failed(ctx, "服务器内部错误暂时无法登录auth-50002"+res.Error().Error())
+	}
+	if res.Error != nil {
+		api.Base.Failed(ctx, "服务器内部错误暂时无法登录auth-50002")
 		return
 	}
 
