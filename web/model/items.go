@@ -70,3 +70,13 @@ func (Items) AddItems(i *Items, flushCache bool) {
 		bootstrap.RedisClient.Del(typeCacheKey)
 	}
 }
+
+func (Items) UpdateItem(i *Items) {
+	bootstrap.DB.Save(i)
+	//分类信息列表缓存
+	typeCacheKey := fmt.Sprintf(ItemListCacheKey, i.Type, 1, i.Uid)
+	//总列表缓存
+	listCacheKey := fmt.Sprintf(ItemListCacheKey, "", 1, i.Uid)
+	bootstrap.RedisClient.Del(listCacheKey)
+	bootstrap.RedisClient.Del(typeCacheKey)
+}

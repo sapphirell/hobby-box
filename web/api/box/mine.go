@@ -7,21 +7,22 @@ import (
 	"strconv"
 	"sukitime.com/v2/web/api"
 	"sukitime.com/v2/web/model"
+	"time"
 )
 
 type addItemsVerify struct {
 	Name        string  `binding:"required"`
 	Image       string  `binding:"required"`
-	BuyTime     int64   `binding:"required" json:"buy_time"`
+	BuyTime     string  `binding:"required" json:"buy_time"`
 	Price       float64 `binding:"required"`
 	Status      int64   `binding:"required"`
-	NextPayTime int64   `binding:"required" json:"next_pay_time"`
+	NextPayTime string  `binding:"required" json:"next_pay_time"`
 	Type        string  `binding:"required"`
 }
 
 type updateItemsVerify struct {
 	addItemsVerify
-	Id string `binding:"required" json:"id"`
+	Id int64 `binding:"required" json:"id"`
 }
 
 func ItemList(ctx *gin.Context) {
@@ -52,13 +53,21 @@ func AddItems(ctx *gin.Context) {
 		api.Base.Failed(ctx, "verify failed:"+err.Error())
 		return
 	}
+	buyTime, err := time.Parse("2006-01-02", binding.BuyTime)
+	if err != nil {
+		log.Println("时间格式化失败:将", binding.BuyTime, "格式化为时间戳")
+	}
+	nextPayTime, err := time.Parse("2006-01-02 15:04", binding.NextPayTime)
+	if err != nil {
+		log.Println("时间格式化失败:将", binding.BuyTime, "格式化为时间戳")
+	}
 	i.Uid = user.Id
 	i.Name = binding.Name
 	i.Image = binding.Image
-	i.BuyTime = binding.BuyTime
+	i.BuyTime = buyTime.Unix()
 	i.Price = binding.Price
 	i.Status = binding.Status
-	i.NextPayTime = binding.NextPayTime
+	i.NextPayTime = nextPayTime.Unix()
 	i.Type = binding.Type
 
 	model.ItemsModel.AddItems(&i, true)
@@ -71,15 +80,10 @@ func UpdateItems(ctx *gin.Context) {
 		api.Base.Failed(ctx, "params invalid: "+err.Error())
 		return
 	}
-	id, err := strconv.Atoi(binding.Id)
-	if err != nil {
-		api.Base.Failed(ctx, "params invalid: ID must be int")
-		return
-	}
 	u, _ := ctx.Get("user")
 	user := u.(*model.User)
 
-	items, err := model.ItemsModel.GetItemsInfoById(int64(id))
+	items, err := model.ItemsModel.GetItemsInfoById(binding.Id)
 	if err != nil {
 		api.Base.Failed(ctx, fmt.Sprintf(api.FailedMsg, "无法查询到对应数据"))
 		return
@@ -88,6 +92,24 @@ func UpdateItems(ctx *gin.Context) {
 		api.Base.Failed(ctx, fmt.Sprintf(api.FailedMsg, "不可访问的物品"))
 		return
 	}
+
+	buyTime, err := time.Parse("2006-01-02", binding.BuyTime)
+	if err != nil {
+		log.Println("时间格式化失败:将", binding.BuyTime, "格式化为时间戳")
+	}
+	nextPayTime, err := time.Parse("2006-01-02 15:04", binding.NextPayTime)
+	if err != nil {
+		log.Println("时间格式化失败:将", binding.NextPayTime, "格式化为时间戳")
+	}
+	items.Name = binding.Name
+	items.Image = binding.Image
+	items.BuyTime = buyTime.Unix()
+	items.Price = binding.Price
+	items.Status = binding.Status
+	items.NextPayTime = nextPayTime.Unix()
+	items.Type = binding.Type
+
+	model.ItemsModel.UpdateItem(items)
 
 	api.Base.Success(ctx, "")
 }
