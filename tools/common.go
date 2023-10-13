@@ -101,13 +101,19 @@ func Upload2QiNiu(url string, save string) (savePath string, err error) {
 }
 
 func GetQiniuUploadToken(path string) (token string) {
-	bucket := "hobby-box"
-	// 需要覆盖的文件名
-	rand.Uint64()
-
+	//bucket := "hobby-box"
+	//// 需要覆盖的文件名
+	//rand.Uint64()
+	//putPolicy := storage.PutPolicy{
+	//	Scope: fmt.Sprintf("%s:%s", bucket, path),
+	//}
+	//mac := qbox.NewMac(ak, sk)
+	//return putPolicy.UploadToken(mac)
 	putPolicy := storage.PutPolicy{
-		Scope: fmt.Sprintf("%s:%s", bucket, path),
+		Scope: "hobby-box",
 	}
+	putPolicy.Expires = 7200 //示例2小时有效期
 	mac := qbox.NewMac(ak, sk)
 	return putPolicy.UploadToken(mac)
+
 }

@@ -17,11 +17,12 @@ func QiniuToken(ctx *gin.Context) {
 		return
 	}
 	user := get.(*model.User)
-	path := "box/" + strconv.FormatInt(user.Id, 10) + "/"
+	path := "/box/" + strconv.FormatInt(user.Id, 10) + "/"
 	path = path + tools.HexMd5(time.Now().String(), strconv.FormatFloat(rand.Float64(), 'f', 2, 64)) + ".jpg"
 	token := tools.GetQiniuUploadToken(path)
 	ret := make(map[string]string)
 	ret["token"] = token
+	ret["path"] = path
 
 	api.Base.Success(ctx, ret)
 }
