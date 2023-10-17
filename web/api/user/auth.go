@@ -57,7 +57,7 @@ func makeLogin(user *model.User) (JT string, err error) {
 		Telphone: user.TelPhone,
 		StandardClaims: jwt.StandardClaims{
 			NotBefore: time.Now().Unix() - 60, //生效时间
-			ExpiresAt: time.Now().Unix() + 3600,
+			ExpiresAt: time.Now().Unix() + 86400*3,
 			Issuer:    "UserCenter", //签发人
 		},
 	}
