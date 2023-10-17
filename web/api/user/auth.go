@@ -208,12 +208,8 @@ func ParseJWT(authorization string) (CommonClaims, error) {
 }
 
 func Mine(ctx *gin.Context) {
-	Authorization := ctx.GetHeader("Authorization")
-	userStatus, err := ParseJWT(Authorization)
-	if err != nil {
-		api.Base.Failed(ctx, err.Error())
-		return
-	}
-	api.Base.Success(ctx, userStatus)
+	u, _ := ctx.Get("user")
+	user := u.(*model.User)
+	api.Base.Success(ctx, user)
 	return
 }
