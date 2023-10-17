@@ -208,8 +208,22 @@ func ParseJWT(authorization string) (CommonClaims, error) {
 }
 
 func Mine(ctx *gin.Context) {
+	// 获取中间件传过来的user
 	u, _ := ctx.Get("user")
 	user := u.(*model.User)
+	//解析auth中的authorization
+	a := ctx.GetHeader("Authorization")
+	authorization, _ := ParseJWT(a)
+	if authorization.ExpiresAt-time.Now().Unix() < 3600*6 {
+		// token即将过期，生成一个新的jwt token
+		newJwt, err := makeLogin(user)
+		if err != nil {
+			api.Base.Failed(ctx, "获取个人信息或更新登录状态产生未知错误。")
+			return
+		}
+		user.LastToken = newJwt
+	}
+
 	api.Base.Success(ctx, user)
 	return
 }

@@ -81,6 +81,7 @@ func LoginVerify() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+
 		c.Set("user", userInfo)
 		log.Printf("userInfo:%+v", userInfo)
 		c.Next()
