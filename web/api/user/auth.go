@@ -197,7 +197,7 @@ func ParseJWT(authorization string) (CommonClaims, error) {
 		ve, _ := err.(*jwt.ValidationError)
 		if ve.Errors == jwt.ValidationErrorExpired {
 			// 登录超时
-			return nilJ, err
+			return nilJ, errors.New("登录状态过期")
 		}
 		log.Printf("解析JWT错误:%s,jwt-string:%s\n", ve.Error(), authorization)
 

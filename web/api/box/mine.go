@@ -11,13 +11,14 @@ import (
 )
 
 type addItemsVerify struct {
-	Name        string  `binding:"required"`
-	Image       string  `binding:"required"`
-	BuyTime     string  `binding:"required" json:"buy_time"`
-	Price       float64 `binding:"required"`
-	Status      int64   `binding:"required"`
-	NextPayTime string  `binding:"required" json:"next_pay_time"`
-	Type        string  `binding:"required"`
+	Name         string  `binding:"required"`
+	Image        string  `binding:"required"`
+	BuyTime      string  `binding:"required" json:"buy_time"`
+	Price        float64 `binding:"required"`
+	Status       int64   `binding:"required"`
+	NextPayTime  string  `binding:"required" json:"next_pay_time"`
+	NextPayPrice int64   `binding:"required" json:"next_pay_price"`
+	Type         string  `binding:"required"`
 }
 
 type updateItemsVerify struct {
@@ -68,6 +69,7 @@ func AddItems(ctx *gin.Context) {
 	i.Price = binding.Price
 	i.Status = binding.Status
 	i.NextPayTime = nextPayTime.Unix()
+	i.NextPayPrice = binding.NextPayPrice
 	i.Type = binding.Type
 
 	model.ItemsModel.AddItems(&i, true)
@@ -107,6 +109,7 @@ func UpdateItems(ctx *gin.Context) {
 	items.Price = binding.Price
 	items.Status = binding.Status
 	items.NextPayTime = nextPayTime.Unix()
+	items.NextPayPrice = binding.NextPayPrice
 	items.Type = binding.Type
 
 	model.ItemsModel.UpdateItem(items)

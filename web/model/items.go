@@ -10,15 +10,16 @@ import (
 
 // Items 我的物品表
 type Items struct {
-	Id          int64   `json:"id"`
-	Name        string  `json:"name"`
-	Image       string  `json:"image"`
-	Uid         int64   `json:"uid"`
-	BuyTime     int64   `json:"buy_time"`
-	Price       float64 `json:"price"`
-	Status      int64   `json:"status"`
-	NextPayTime int64   `json:"next_pay_time"`
-	Type        string  `json:"type"`
+	Id           int64   `json:"id"`
+	Name         string  `json:"name"`
+	Image        string  `json:"image"`
+	Uid          int64   `json:"uid"`
+	BuyTime      int64   `json:"buy_time"`
+	Price        float64 `json:"price"`
+	Status       int64   `json:"status"`
+	NextPayTime  int64   `json:"next_pay_time"`
+	NextPayPrice int64   `json:"next_pay_price"`
+	Type         string  `json:"type"`
 }
 
 var ItemsModel Items
