@@ -152,16 +152,23 @@ func LoginWithWechat(ctx *gin.Context) {
 		api.Base.FailedWithContent(ctx, "微信授权登录失败", errData)
 		return
 	}
+	openId := wechatResp.OpenID
+	sessionKey := wechatResp.SessionKey
+	//var openId = "xxx"
+	//var sessionKey = "xxx"
+	//var err error
+
 	//查询openID是否注册过，如果没有返回前端询问是否注册新号
 	user := new(model.User)
-	res := bootstrap.DB.Where("wechat_open_id = ?", wechatResp.OpenID).First(user)
+	res := bootstrap.DB.Where("wechat_open_id = ?", openId).First(user)
+
 	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		//如果未注册用户，则生成一个新号
-		user.WechatOpenID = wechatResp.OpenID
-		user.WechatSessionKey = wechatResp.SessionKey
+		user.WechatOpenID = openId
+		user.WechatSessionKey = sessionKey
 		user.Password = "wechat-register"
-		user.Username = "微信用户" + wechatResp.OpenID
-		user.Account = "微信用户" + wechatResp.OpenID
+		user.Username = "微信用户" + openId
+		user.Account = "微信用户" + openId
 		user.Avatar = "/default_avatar.jpg"
 		user.ShortDomain = ""
 		user, err = makeRegister(user)
@@ -182,8 +189,8 @@ func LoginWithWechat(ctx *gin.Context) {
 	}
 	ret := make(map[string]string)
 	ret["jwt_token"] = jwtToken
-	ret["open_id"] = wechatResp.OpenID
-	ret["session_key"] = wechatResp.SessionKey
+	ret["open_id"] = openId
+	ret["session_key"] = sessionKey
 
 	api.Base.Success(ctx, ret)
 }
