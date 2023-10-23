@@ -170,8 +170,8 @@ func LoginWithWechat(ctx *gin.Context) {
 			return
 		}
 	}
-	if res.Error != nil {
-		api.Base.Failed(ctx, "服务器内部错误暂时无法登录auth-50002"+res.Error.Error())
+	if res.Error != nil && !errors.Is(res.Error, gorm.ErrRecordNotFound) {
+		api.Base.Failed(ctx, "服务器内部错误暂时无法登录auth-50002 "+res.Error.Error())
 		return
 	}
 
