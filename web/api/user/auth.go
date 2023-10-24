@@ -154,9 +154,6 @@ func LoginWithWechat(ctx *gin.Context) {
 	}
 	openId := wechatResp.OpenID
 	sessionKey := wechatResp.SessionKey
-	//var openId = "xxx"
-	//var sessionKey = "xxx"
-	//var err error
 
 	//查询openID是否注册过，如果没有返回前端询问是否注册新号
 	user := new(model.User)

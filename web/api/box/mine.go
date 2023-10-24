@@ -11,14 +11,14 @@ import (
 )
 
 type addItemsVerify struct {
-	Name         string  `binding:"required"`
-	Image        string  `binding:"required"`
-	BuyTime      string  `binding:"required" json:"buy_time"`
-	Price        float64 `binding:"required"`
-	Status       int64   `binding:"required"`
-	NextPayTime  string  `binding:"required" json:"next_pay_time"`
-	NextPayPrice int64   `binding:"required" json:"next_pay_price"`
-	Type         string  `binding:"required"`
+	Name         string   `binding:"required"`
+	Image        string   `binding:"required"`
+	BuyTime      string   `binding:"required" json:"buy_time"`
+	Price        *float64 `binding:"required"`
+	Status       int64    `binding:"required"`
+	NextPayTime  *string  `binding:"required" json:"next_pay_time"`
+	NextPayPrice *int64   `binding:"required" json:"next_pay_price"`
+	Type         string   `binding:"required"`
 }
 
 type updateItemsVerify struct {
@@ -58,18 +58,19 @@ func AddItems(ctx *gin.Context) {
 	if err != nil {
 		log.Println("时间格式化失败:将", binding.BuyTime, "格式化为时间戳")
 	}
-	nextPayTime, err := time.Parse("2006-01-02 15:04", binding.NextPayTime)
+	nextPayTime, err := time.Parse("2006-01-02 15:04", *binding.NextPayTime)
 	if err != nil {
 		log.Println("时间格式化失败:将", binding.BuyTime, "格式化为时间戳")
 	}
+
 	i.Uid = user.Id
 	i.Name = binding.Name
 	i.Image = binding.Image
 	i.BuyTime = buyTime.Unix()
-	i.Price = binding.Price
+	i.Price = *binding.Price
 	i.Status = binding.Status
 	i.NextPayTime = nextPayTime.Unix()
-	i.NextPayPrice = binding.NextPayPrice
+	i.NextPayPrice = *binding.NextPayPrice
 	i.Type = binding.Type
 
 	model.ItemsModel.AddItems(&i, true)
@@ -99,17 +100,17 @@ func UpdateItems(ctx *gin.Context) {
 	if err != nil {
 		log.Println("时间格式化失败:将", binding.BuyTime, "格式化为时间戳")
 	}
-	nextPayTime, err := time.Parse("2006-01-02 15:04", binding.NextPayTime)
+	nextPayTime, err := time.Parse("2006-01-02 15:04", *binding.NextPayTime)
 	if err != nil {
 		log.Println("时间格式化失败:将", binding.NextPayTime, "格式化为时间戳")
 	}
 	items.Name = binding.Name
 	items.Image = binding.Image
 	items.BuyTime = buyTime.Unix()
-	items.Price = binding.Price
+	items.Price = *binding.Price
 	items.Status = binding.Status
 	items.NextPayTime = nextPayTime.Unix()
-	items.NextPayPrice = binding.NextPayPrice
+	items.NextPayPrice = *binding.NextPayPrice
 	items.Type = binding.Type
 
 	model.ItemsModel.UpdateItem(items)
