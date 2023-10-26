@@ -1,4 +1,5 @@
 FROM golang:1.18.2
+RUN yum -y install google-chrome-stable --nogpgcheck
 #设置代理
 RUN go env -w GO111MODULE=on
 RUN go env -w GOPROXY=https://goproxy.cn,direct
