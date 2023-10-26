@@ -43,6 +43,7 @@ func GetDownloadList(ctx *gin.Context) {
 		"#noteContainer > div.media-container > div > div > div.swiper.swiper-initialized.swiper-horizontal.swiper-pointer-events.note-slider.narrower > div > div.swiper-slide.swiper-slide-active")
 	if err != nil {
 		api.Base.Failed(ctx, "获取图片地址失败,请重试")
+		return
 	}
 	ret := downloadAndUpload(links)
 	api.Base.Success(ctx, ret)
